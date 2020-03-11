@@ -1,0 +1,15 @@
+.book-details .col:nth-child(1){
+    max-width: 250px;
+}
+
+.book-details .col:nth-child(2){
+    flex-grow: 5;
+}
+
+.book-details img {
+    width: 100%;
+}
+
+.book-details .title {
+    font-weight: 600;
+}

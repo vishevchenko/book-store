@@ -1,0 +1,15 @@
+.book-list {
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.book-list > .book-list-item {
+    flex: 1 1 50%;
+    margin-bottom: 30px;
+}
+
+@media screen and (max-width: 767px) {
+    .book-list > .book-list-item {
+        flex: 1 100%;
+    }
+}

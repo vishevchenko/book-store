@@ -1,0 +1,18 @@
+.page-not-found {
+    position: absolute;
+    text-align: center;
+    color: rgb(201, 132, 132);
+    top: 20%;
+    left: 0;
+    height: 340px;
+    width: 100%;
+}
+
+.page-not-found .sad-icon {
+    font-size: 200px;
+}
+
+.page-not-found h1 {
+    font-size: 56px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}

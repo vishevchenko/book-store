@@ -1,0 +1,20 @@
+.order-list thead {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.order-list tfoot {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.order-list tbody tr:hover {
+    cursor: pointer;
+    background-color: #e6e6e6;
+}
+
+.order-list tbody td,
+.order-list tbody th {
+    background-color: transparent;
+}

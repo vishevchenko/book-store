@@ -1,0 +1,21 @@
+.book-list-item img {
+    width: 150px;
+}
+
+.book-list-item a {
+    text-decoration: none;;
+}
+
+.book-list-item h5 {
+    color: #6a96bb;
+    font-size: 28px;
+}
+
+.book-list-item p {
+    font-size: 18px;
+}
+
+.book-list-item span {
+    letter-spacing: 2px;
+    font-weight: 600;
+}
