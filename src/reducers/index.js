@@ -4,8 +4,62 @@ const saveCartToLS = (cart) => {
 }
 
 const restoreCartFromLS = () => {
-    const cart = localStorage.getItem('cart');
-    return JSON.parse(cart) || [];
+    const savedCart = localStorage.getItem('cart');
+    const cart = JSON.parse(savedCart) || [];
+    let itemsCount = 0;
+    let totalPrice = 0;
+
+    cart.forEach(({ count, total }) => {
+        itemsCount += count;
+        totalPrice += total;
+    });
+
+    return {
+        cart,
+        itemsCount,
+        totalPrice
+    }
+}
+
+const updateCartItem = (book, item = {}, qty) => {
+    const {
+        id = book.id,
+        count = 0,
+        title = book.title,
+        total = 0 } = item;
+
+    return {
+        id, title,
+        count: count + qty,
+        total: total + book.price
+    };
+}
+
+const updateCartItems = (cart, item, idx) => {
+    let itemsCount = 0;
+    let totalPrice = 0;
+    const newCart = cart.slice();
+
+    if (item.count === 0) {
+        newCart.splice(idx, 1);
+    } else if (-1 !== idx) {
+        newCart.splice(idx, 1, item)
+    } else {
+        newCart.push(item);
+    }
+
+    newCart.forEach(({ count, total }) => {
+        itemsCount += count;
+        totalPrice += total;
+    });
+
+    saveCartToLS(newCart);
+
+    return {
+        cart: newCart,
+        itemsCount,
+        totalPrice
+    };
 }
 
 const initalState = {
@@ -14,112 +68,104 @@ const initalState = {
     bookLoading: true,
     booksLoading: true,
     bookNotFound: false,
-    cart: restoreCartFromLS()
+    error: null,
+    ...restoreCartFromLS()
 };
 
 const reducer = (state = initalState, action) => {
 
     switch (action.type) {
-        case 'BOOKS_LOADED': {
+        case 'FETCH_BOOKS_REQUEST': {
+            return {
+                ...state,
+                booksLoading: true,
+                error: null
+            }
+        }
+
+        case 'FETCH_BOOKS_SUCCESS': {
             return {
                 ...state,
                 books: action.payload,
                 booksLoading: false,
+                error: null
             }
         }
 
-        case 'BOOK_RECEIVED': {
+        case 'FETCH_BOOKS_FAILURE': {
+            return {
+                ...state,
+                books: [],
+                booksLoading: false,
+                error: action.payload
+            };
+        }
+
+        case 'FETCH_BOOK_REQUEST': {
+            return {
+                ...state,
+                book: null,
+                bookLoading: true,
+                bookNotFound: false
+            }
+        }
+        case 'FETCH_BOOK_SUCCESS': {
             return {
                 ...state,
                 book: action.payload,
                 bookLoading: false,
-                bookNotFound: !action.payload
+                bookNotFound: false
+            }
+        }
+        case 'FETCH_BOOK_ERROR': {
+            return {
+                ...state,
+                book: null,
+                bookLoading: false,
+                bookNotFound: true
             }
         }
 
-        case 'ADD_TO_CART': {
-            const { payload: book } = action;
-            const { id, title, price } = book;
-            const { cart } = state;
-            const idx = cart.findIndex(item => (book.id === item.id));
 
-            if (-1 === idx) {
-                const newItem = {
-                    id,
-                    title,
-                    price,
-                    count: 1
-                };
-                return {
-                    ...state,
-                    cart: [...cart, newItem]
-                };
-            }
 
-            const bookInCart = cart[idx];
-            const newItem = {
-                ...bookInCart,
-                count: bookInCart.count + 1
-            };
+        case 'BOOK_ADDED_TO_CART': {
+            const { cart, books } = state;
+            const book = books.find(({ id }) => id === action.payload);
+            const itemIdx = cart.findIndex(({ id }) => id === action.payload);
+            const cartItem = cart[itemIdx];
+            const newItem = updateCartItem(book, cartItem, 1);
 
             return {
                 ...state,
-                cart: [
-                    ...cart.slice(0, idx),
-                    newItem,
-                    ...cart.slice(idx + 1)
-                ]
+                ...updateCartItems(cart, newItem, itemIdx)
             };
+
         }
 
-        case 'CART_UPDATED': {
-            saveCartToLS(state.cart)
-            return state;
-        }
-
-        case 'REMOVE_FROM_CART': {
-            const { cart } = state;
-            const bookId = action.payload;
-            const idx = cart.findIndex(book => book.id === bookId);
+        case 'BOOK_REMOVED_FROM_CART': {
+            const { cart, books } = state;
+            const book = books.find(({ id }) => id === action.payload);
+            const itemIdx = cart.findIndex(({ id }) => id === action.payload);
+            const cartItem = cart[itemIdx];
+            const newItem = updateCartItem(book, cartItem, -1);
 
             return {
                 ...state,
-                cart: [
-                    ...cart.slice(0, idx),
-                    ...cart.slice(idx + 1)
-                ]
-            }
+                ...updateCartItems(cart, newItem, itemIdx)
+            };
         }
 
-        case 'REDUCE_IN_CART': {
-            const { cart } = state;
-            const bookId = action.payload;
-            const idx = cart.findIndex(book => book.id === bookId);
-            const book = cart[idx]
-
-            const newBook = {
-                ...book,
-                count: book.count - 1
-            };
-
-            if (newBook.count <= 0) {
-                return {
-                    ...state,
-                    cart: [
-                        ...cart.slice(0, idx),
-                        ...cart.slice(idx + 1)
-                    ]
-                }
-            }
+        case 'REMOVE_ALL_BOOKS_FROM_CART': {
+            const { cart, books } = state;
+            const book = books.find(({ id }) => id === action.payload);
+            const itemIdx = cart.findIndex(({ id }) => id === action.payload);
+            const cartItem = cart[itemIdx];
+            const newItem = updateCartItem(book, cartItem, -cartItem.count);
 
             return {
                 ...state,
-                cart: [
-                    ...cart.slice(0, idx),
-                    newBook,
-                    ...cart.slice(idx + 1)
-                ]
-            }
+                ...updateCartItems(cart, newItem, itemIdx)
+            };;
 
         }
 

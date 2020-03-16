@@ -13,7 +13,7 @@ const OrderList = ({ cart }) => {
 
     let cartTotal = 0;
 
-    cart.forEach(item => cartTotal += (item.price * item.count));
+    cart.forEach(item => cartTotal += (item.total));
 
     return (
         <table className="order-list table">

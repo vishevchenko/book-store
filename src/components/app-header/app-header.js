@@ -4,14 +4,7 @@ import { Link } from 'react-router-dom';
 
 import "./app-header.css";
 
-const AppHeader = ({ cart }) => {
-
-    let itemsCount = 0;
-    let totalPrice = 0;
-    cart.forEach(({ price, count }) => {
-        itemsCount += count;
-        totalPrice += count * price;
-    });
+const AppHeader = ({ itemsCount, totalPrice }) => {
 
     return (
         <ul className="app-header nav">
@@ -29,8 +22,11 @@ const AppHeader = ({ cart }) => {
     )
 }
 
-const mapStateToProps = ({ cart }) => {
-    return { cart }
-};
+const mapStateToProps = ({ itemsCount, totalPrice }) => {
+    return {
+        itemsCount,
+        totalPrice
+    };
+}
 
 export default connect(mapStateToProps)(AppHeader);

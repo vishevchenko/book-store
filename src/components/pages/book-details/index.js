@@ -1,37 +1,44 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-import { bookReceived } from "./../../../actions";
+import { fetchBookDetails } from "./../../../actions";
 import { withBookStoreService } from "../../hoc";
 import { compose } from "../../../utils";
 
 import BookDetails from "../../book-details";
+import Spinner from "../../spinner";
+import NotFound from "../404";
 
 class BookDetailsPage extends Component {
 
     componentDidMount() {
-
         const { id: bookId } = this.props.match.params;
-        const { bookReceived } = this.props;
-
-        this.props.bookStoreService
-            .getBookById(bookId * 1)
-            .then(data => {
-                bookReceived(data);
-            });
+        this.props.fetchBook(parseInt(bookId));
     }
 
     render() {
-        return <BookDetails />
+        const { book, bookLoading, bookNotFound } = this.props;
+
+        if (bookLoading) return <Spinner />
+
+        if (bookNotFound) return <NotFound />
+
+        return <BookDetails book={book} />
     }
 }
 
-const mapStateToProps = () => {
-    return {}
+const mapStateToProps = ({ book, bookLoading, bookNotFound }) => {
+    return {
+        book,
+        bookLoading,
+        bookNotFound
+    }
 };
 
-const mapDispatchToProps = {
-    bookReceived
+const mapDispatchToProps = (dispatch, { bookStoreService }) => {
+    return {
+        fetchBook: fetchBookDetails(bookStoreService, dispatch)
+    }
 };
 
 export default compose(

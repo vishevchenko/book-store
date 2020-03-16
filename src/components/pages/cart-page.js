@@ -1,9 +1,30 @@
-import React from "react";
+import React, { Component } from "react";
+import { connect } from "react-redux";
+
+import { compose } from "../../utils";
+import { withBookStoreService } from "../hoc";
+
+import { fetchBooks } from "../../actions";
 
 import YourOrder from "../your-order";
 
-const CartPage = () => {
-    return <YourOrder />
+class CartPage extends Component {
+    componentDidMount() {
+        this.props.fetchBooks();
+    }
+
+    render() {
+        return <YourOrder />
+    }
 };
 
-export default CartPage;
+const mapDispatchToProps = (dispatch, { bookStoreService }) => {
+    return {
+        fetchBooks: fetchBooks(bookStoreService, dispatch)
+    }
+};
+
+export default compose(
+    withBookStoreService(),
+    connect(undefined, mapDispatchToProps)
+)(CartPage);

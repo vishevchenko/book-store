@@ -1,19 +1,11 @@
 import React from "react";
-import { connect } from "react-redux";
-
-import Spinner from "../spinner";
-import NotFound from "../pages/404";
-
 import "./book-details.css";
-import { addToCart, cartUpdated } from "../../actions";
 
-const BookDetails = ({ book, addToCart, cartUpdated, bookLoading, bookNotFound }) => {
-    if (bookLoading) return <Spinner />;
 
-    if (bookNotFound) return <NotFound />;
+const BookDetails = ({ book, onAddToCart }) => {
 
     const {
-        title, description,
+        id, title, description,
         coverImg, price, author } = book;
 
     return (
@@ -26,23 +18,12 @@ const BookDetails = ({ book, addToCart, cartUpdated, bookLoading, bookNotFound }
                 <p className="author">by {author}</p>
                 <p className="description">{description}</p>
                 <button className="btn btn-primary pull-right align-bottom"
-                    onClick={() => { addToCart(book); cartUpdated() }}>Add To Cart (${price})</button>
+                    onClick={() => { onAddToCart(id); }}>Add To Cart (${price})
+                    </button>
             </div>
         </div>
     );
 };
 
-const mapStateToProps = ({ book, bookLoading, bookNotFound }) => {
-    return {
-        book,
-        bookLoading,
-        bookNotFound
-    };
-};
 
-const mapDispatchToProps = {
-    addToCart,
-    cartUpdated
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(BookDetails);
+export default BookDetails;
